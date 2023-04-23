@@ -1,0 +1,39 @@
+version: "3"
+services:
+  node:
+    build:
+      context: ./app
+      dockerfile: Dockerfile-node
+    ports:
+      - "3000:3000"
+    environment:
+      - NODE_ENV=development
+      - DB_HOST=mysql
+      - DB_USER=root
+      - DB_PASSWORD=root
+      - DB_NAME=stocky
+      - CORS_ORIGIN=http://localhost:3000
+      - CORS_HEADERS=Content-Type, Authorization
+  mysql:
+    image: mysql:5.7
+    restart: always
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=stocky
+    volumes:
+      - my-db:/var/lib/mysql
+    healthcheck:
+      test: ["CMD", "mysqladmin", "ping", "-h", "localhost"]
+      timeout: 20s
+      retries: 10
+  phpmyadmin:
+    image: phpmyadmin/phpmyadmin
+    environment:
+      PMA_HOST: mysql
+      PMA_PORT: 3306
+    ports:
+      - "8080:80"
+volumes:
+  my-db:
